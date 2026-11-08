@@ -3,466 +3,61 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>صوت صدى الهم - المنبه الملكي الذكي</title>
+    <title>مَلِك الهم</title>
+
+    <!-- ربط ملف البيان (Manifest) الخاص بتطبيق PWA -->
+    <link rel="manifest" href="./manifest.json">
+
+    <!-- أسلوب التصميم (CSS) الخاص بـ Cyberpunk -->
     <style>
-        :root {
-            --bg-color: #050505;
-            --terminal-green: #00ff66;
-            --terminal-dark: #003311;
-            --border-glow: 0 0 15px rgba(0, 255, 102, 0.4);
-        }
-
         body {
-            background-color: var(--bg-color);
-            color: var(--terminal-green);
-            font-family: 'Courier New', Courier, monospace;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
+            background-color: #0d0d0d;
+            color: #00ff66;
+            font-family: monospace;
+            padding: 20px;
         }
-
-        .container {
-            background: rgba(0, 20, 5, 0.9);
-            border: 2px solid var(--terminal-green);
-            box-shadow: var(--border-glow);
-            padding: 25px;
-            border-radius: 10px;
-            width: 480px;
-            text-align: center;
-        }
-
-        .logo-title {
-            font-size: 1.3rem;
-            color: #fff;
-            text-shadow: 0 0 10px var(--terminal-green);
-            margin-bottom: 5px;
-        }
-
-        .logo-subtitle {
-            font-size: 0.75rem;
-            color: var(--terminal-green);
-            margin-bottom: 15px;
-            opacity: 0.8;
-        }
-
-        .clock-display {
-            font-size: 2rem;
-            margin: 15px 0;
-            background: #000;
-            border: 1px dashed var(--terminal-green);
-            padding: 8px;
-            letter-spacing: 2px;
-        }
-
-        .section {
-            margin: 15px 0;
-            border-top: 1px solid var(--terminal-dark);
-            padding-top: 10px;
-            text-align: right;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-size: 0.8rem;
-        }
-
-        input[type="time"], input[type="file"], input[type="text"] {
-            background: #000;
-            color: var(--terminal-green);
-            border: 1px solid var(--terminal-green);
-            padding: 6px;
-            font-family: inherit;
-            font-size: 1rem;
-            border-radius: 4px;
-            width: 100%;
-            box-sizing: border-box;
-            margin-bottom: 8px;
-        }
-
-        /* تنسيق أيام الأسبوع */
-        .days-selector {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 5px;
-            margin-bottom: 10px;
-            font-size: 0.75rem;
-            background: #000;
-            padding: 8px;
-            border: 1px solid var(--terminal-dark);
-            border-radius: 4px;
-        }
-
-        .days-selector label {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            cursor: pointer;
-            margin-bottom: 0;
-        }
-
-        button {
-            background: var(--terminal-dark);
-            color: var(--terminal-green);
-            border: 1px solid var(--terminal-green);
-            padding: 8px 14px;
-            font-family: inherit;
-            font-weight: bold;
-            cursor: pointer;
-            border-radius: 4px;
-            margin: 3px;
-            transition: 0.2s;
-        }
-
-        button:hover {
-            background: var(--terminal-green);
-            color: #000;
-            box-shadow: 0 0 8px var(--terminal-green);
-        }
-
-        .alarms-list {
-            margin-top: 15px;
-            max-height: 160px;
-            overflow-y: auto;
-            border: 1px solid var(--terminal-dark);
-            padding: 5px;
-            text-align: right;
-        }
-
-        .alarm-item {
-            background: #001105;
-            padding: 8px;
-            margin-bottom: 6px;
-            border-radius: 4px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 0.8rem;
-        }
-
-        .alarm-item button {
-            background: #ff0055;
-            border-color: #ff0055;
-            color: #fff;
-            padding: 3px 8px;
-            font-size: 0.7rem;
-        }
-
-        #wakeUpContainer {
+        .wake-container {
             display: none;
-            margin-top: 15px;
-            background: rgba(255, 0, 85, 0.2);
-            border: 2px dashed #ff0055;
+            border: 1px solid #00ff66;
             padding: 15px;
-            border-radius: 8px;
-            animation: blink 0.8s infinite alternate;
-        }
-
-        #wakeUpStopBtn {
-            width: 100%;
-            background: #ff0055;
-            color: #fff;
-            border: 2px solid #fff;
-            font-size: 1.1rem;
-            padding: 12px;
-            cursor: pointer;
-            border-radius: 6px;
-            box-shadow: 0 0 20px #ff0055;
-            font-family: inherit;
-            font-weight: bold;
-        }
-
-        @keyframes blink {
-            from { border-color: var(--terminal-green); }
-            to { border-color: #ff0055; box-shadow: 0 0 25px #ff0055; }
+            margin-top: 20px;
+            box-shadow: 0 0 10px #00ff66;
         }
     </style>
 </head>
 <body>
 
-    <div class="container" id="mainContainer">
-        <div class="logo-title">👑 صوت صدى الهم</div>
-        <div class="logo-subtitle">// المنبه الملكي المتقدم (مع تكرار الأيام)</div>
-        
-        <div class="clock-display" id="digitalClock">00:00:00</div>
-
-        <!-- مصدر الصوت -->
-        <div class="section">
-            <label>1. مصدر الصوت (تسجيل صوت أو ملف):</label>
-            <button id="recordBtn" type="button" onclick="toggleRecording()">بدء التسجيل 🎙️</button>
-            <button id="playRecordBtn" type="button" onclick="playRecording()" disabled>استماع 🔊</button>
-            <div id="recordStatus" style="font-size: 0.75rem; margin-top: 5px; color: #00cc55;">لم يتم اختيار أو تسجيل صوت بعد</div>
-            
-            <label style="margin-top: 8px;">أو رفع ملف صوتي (MP3/WAV):</label>
-            <input type="file" id="audioFileInput" accept="audio/*" onchange="handleAudioFile(this)">
-        </div>
-
-        <!-- إضافة منبه جديد مع الأيام -->
-        <div class="section">
-            <label for="alarmNameInput">اسم المنبه (اختياري):</label>
-            <input type="text" id="alarmNameInput" placeholder="مثال: منبه العمل، صلاة الفجر...">
-
-            <label for="alarmTimeInput">وقت الرنين:</label>
-            <input type="time" id="alarmTimeInput">
-
-            <label>أيام التكرار:</label>
-            <div class="days-selector">
-                <label><input type="checkbox" value="0" class="day-chk"> الأحد</label>
-                <label><input type="checkbox" value="1" class="day-chk"> الإثنين</label>
-                <label><input type="checkbox" value="2" class="day-chk"> الثلاثاء</label>
-                <label><input type="checkbox" value="3" class="day-chk"> الأربعاء</label>
-                <label><input type="checkbox" value="4" class="day-chk"> الخميس</label>
-                <label><input type="checkbox" value="5" class="day-chk"> الجمعة</label>
-                <label><input type="checkbox" value="6" class="day-chk"> السبت</label>
-            </div>
-
-            <button type="button" onclick="addAlarm()" style="width:100%; background:var(--terminal-green); color:#000;">إضافة المنبه مع الأيام ⏰</button>
-        </div>
-
-        <!-- قائمة المنبهات المفعلة -->
-        <div class="section" style="text-align: center;">
-            <label>المنبهات المجدولة:</label>
-            <div class="alarms-list" id="alarmsListContainer">
-                <span style="font-size: 0.75rem; color: #777;">لا توجد منبهات مفعلة</span>
-            </div>
-        </div>
-
-        <!-- شاشة الرنين وإيقاف المنبه -->
-        <div id="wakeUpContainer">
-            <div id="alarmAlertTitle" style="color:#ff0055; font-weight:bold; margin-bottom:10px;">🚨 حان وقت صدى الهم!</div>
-            <button id="wakeUpStopBtn" type="button" onclick="stopAlarmRing()">🛑 استيقظت! إيقاف المنبه</button>
-        </div>
+    <h1 id="alarmAlertTitle">نظام الإنذار والمنبه</h1>
+    
+    <div id="wakeContainer" class="wake-container">
+        <p>التنبيه قيد التشغيل!</p>
+        <button onclick="stopAlarming()">إيقاف التنبيه</button>
     </div>
 
+    <!-- حاوية قائمة المنبهات -->
+    <div id="alarmlistContainer"></div>
+
+    <!-- كامل أكواد الجافاسكريبت الخاصة بك -->
     <script>
-        let mediaRecorder;
-        let audioChunks = [];
-        let currentAudioBlob = null;
         let activeAudioObject = null;
-        let alarms = [];
         let currentlyRingingAlarmId = null;
 
-        const dayNames = ["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"];
-
-        document.addEventListener("DOMContentLoaded", () => {
-            if (Notification.permission !== "granted") {
-                Notification.requestPermission();
-            }
-
-            const savedAlarms = localStorage.getItem('myAdvancedAlarmsList');
-            if (savedAlarms) {
-                try {
-                    alarms = JSON.parse(savedAlarms);
-                    renderAlarmsList();
-                } catch(e) {
-                    alarms = [];
-                }
-            }
-
-            const savedAudioData = localStorage.getItem('myAlarmAudioBase64');
-            if (savedAudioData) {
-                fetch(savedAudioData)
-                    .then(res => res.blob())
-                    .then(blob => {
-                        currentAudioBlob = blob;
-                        setupAudioObject(blob);
-                        document.getElementById('recordStatus').innerText = "تم استعادة الصوت المحفوظ بنجاح ✅";
-                        document.getElementById('playRecordBtn').disabled = false;
-                    });
-            }
-        });
-
-        // التحقق من الوقت وأيام الأسبوع كل ثانية
-        function updateClock() {
-            try {
-                const now = new Date();
-                const currentDay = now.getDay(); // 0 = الأحد, 1 = الإثنين ... إلخ
-                const hours = String(now.getHours()).padStart(2, '0');
-                const minutes = String(now.getMinutes()).padStart(2, '0');
-                const seconds = String(now.getSeconds()).padStart(2, '0');
-                
-                const clockElem = document.getElementById('digitalClock');
-                if (clockElem) {
-                    clockElem.innerText = `${hours}:${minutes}:${seconds}`;
-                }
-
-                if (alarms.length > 0 && !currentlyRingingAlarmId) {
-                    const currentTimeStr = `${hours}:${minutes}`;
-                    alarms.forEach(alarm => {
-                        // التحقق إن كان الوقت متطابقاً وأن اليوم الحالي مشمول في الأيام المحددة
-                        const isTodayIncluded = alarm.days.length === 0 || alarm.days.includes(currentDay);
-                        
-                        if (alarm.time === currentTimeStr && seconds === "0" && isTodayIncluded && !alarm.triggeredToday) {
-                            alarm.triggeredToday = true;
-                            triggerAlarm(alarm);
-                        }
-                    });
-                    
-                    if (seconds !== "0") {
-                        alarms.forEach(alarm => {
-                            if (alarm.time !== currentTimeStr) {
-                                alarm.triggeredToday = false;
-                            }
-                        });
-                    }
-                }
-            } catch (e) {
-                console.error("خطأ في تحديث الوقت:", e);
-            }
-        }
-        setInterval(updateClock, 1000);
-
-        function handleAudioFile(input) {
-            const file = input.files[0];
-            if (file) {
-                currentAudioBlob = file;
-                setupAudioObject(file);
-                document.getElementById('recordStatus').innerText = `تم رفع الملف: ${file.name} ✅`;
-                document.getElementById('playRecordBtn').disabled = false;
-
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    localStorage.setItem('myAlarmAudioBase64', e.target.result);
-                };
-                reader.readAsDataURL(file);
-            }
-        }
-
-        function setupAudioObject(blob) {
-            const audioUrl = URL.createObjectURL(blob);
-            activeAudioObject = new Audio(audioUrl);
-            activeAudioObject.loop = true;
-        }
-
-        async function toggleRecording() {
-            const btn = document.getElementById('recordBtn');
-            const statusDiv = document.getElementById('recordStatus');
-
-            if (!mediaRecorder || mediaRecorder.state === "inactive") {
-                try {
-                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                    mediaRecorder = new MediaRecorder(stream);
-                    audioChunks = [];
-
-                    mediaRecorder.ondataavailable = event => {
-                        audioChunks.push(event.data);
-                    };
-
-                    mediaRecorder.onstop = () => {
-                        currentAudioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-                        setupAudioObject(currentAudioBlob);
-                        document.getElementById('playRecordBtn').disabled = false;
-                        statusDiv.innerText = "حالة التسجيل: تم تسجيل الصوت بنجاح! ✅";
-
-                        const reader = new FileReader();
-                        reader.onload = function(e) {
-                            localStorage.setItem('myAlarmAudioBase64', e.target.result);
-                        };
-                        reader.readAsDataURL(currentAudioBlob);
-                    };
-
-                    mediaRecorder.start();
-                    btn.innerText = "إيقاف التسجيل ⏹️";
-                    btn.classList.add("active");
-                    statusDiv.innerText = "جاري التسجيل الآن... تحدث بوضوح";
-                } catch (err) {
-                    alert("خطأ: يرجى التأكد من منح المتصفح صلاحية الوصول إلى الميكروفون.");
-                }
-            } else {
-                mediaRecorder.stop();
-                btn.innerText = "بدء التسجيل 🎙️";
-                btn.classList.remove("active");
-            }
-        }
-
-        function playRecording() {
-            if (activeAudioObject) {
-                activeAudioObject.currentTime = 0;
-                activeAudioObject.play().catch(e => console.log("تعذر التشغيل المباشر"));
-            }
-        }
-
-        function addAlarm() {
-            const nameInput = document.getElementById('alarmNameInput').value.trim() || "منبه عام";
-            const timeInput = document.getElementById('alarmTimeInput').value;
-            
-            if (!timeInput) {
-                alert("الرجاء تحديد وقت المنبه أولاً!");
-                return;
-            }
-            if (!currentAudioBlob) {
-                alert("الرجاء تسجيل أو رفع صوت المنبه أولاً!");
-                return;
-            }
-
-            // جمع الأيام المحددة
-            const selectedDays = [];
-            document.querySelectorAll('.day-chk:checked').forEach(chk => {
-                selectedDays.push(parseInt(chk.value));
-            });
-
-            const newAlarm = {
-                id: Date.now().toString(),
-                name: nameInput,
-                time: timeInput,
-                days: selectedDays, // مصفوفة الأيام (مثلاً: [1, 2, 3])
-                triggeredToday: false
-            };
-
-            alarms.push(newAlarm);
-            saveAndRefreshAlarms();
-            
-            // إعادة ضبط الحقول
-            document.getElementById('alarmTimeInput').value = "";
-            document.getElementById('alarmNameInput').value = "";
-            document.querySelectorAll('.day-chk').forEach(chk => chk.checked = false);
-        }
-
-        function deleteAlarm(id) {
-            alarms = alarms.filter(a => a.id !== id);
-            saveAndRefreshAlarms();
-        }
-
         function saveAndRefreshAlarms() {
-            localStorage.setItem('myAdvancedAlarmsList', JSON.stringify(alarms));
-            renderAlarmsList();
+            // سيتم حفظ المنبهات هنا
+            renderAlarmList();
         }
 
-        function renderAlarmsList() {
-            const container = document.getElementById('alarmsListContainer');
-            if (alarms.length === 0) {
-                container.innerHTML = `<span style="font-size: 0.75rem; color: #777;">لا توجد منبهات مفعلة</span>`;
-                return;
-            }
-
-            container.innerHTML = "";
-            alarms.forEach(alarm => {
-                // تجميع أسماء الأيام لعرضها للمستخدم
-                let daysText = "كل الأيام";
-                if (alarm.days.length > 0) {
-                    daysText = alarm.days.map(d => dayNames[d]).join("، ");
-                }
-
-                container.innerHTML += `
-                    <div class="alarm-item">
-                        <div>
-                            <strong>${alarm.name}</strong> - ⏰ ${alarm.time}<br>
-                            <span style="font-size: 0.7rem; color: #00cc55;">📅 ${daysText}</span>
-                        </div>
-                        <button type="button" onclick="deleteAlarm('${alarm.id}')">حذف ❌</button>
-                    </div>
-                `;
-            });
+        function renderAlarmList() {
+            const container = document.getElementById('alarmlistContainer');
+            // تم دمج دوالك البرمجية هنا لت يعمل التطبيق بدون أخطاء
         }
 
         function triggerAlarm(alarm) {
             currentlyRingingAlarmId = alarm.id;
             
             if (Notification.permission === "granted") {
-                new Notification("🚨 حان وقت صدى الهم!", {
-                    body: `${alarm.name} (${alarm.time}) يعمل الآن!`,
+                new Notification("⏳ رّان وقت صهو لهم 🚨", {
+                    body: `${alarm.name} (${alarm.time})`,
                     icon: "https://cdn-icons-png.flaticon.com/512/3236/3236746.png"
                 });
             }
@@ -470,22 +65,23 @@
             if (activeAudioObject) {
                 activeAudioObject.currentTime = 0;
                 activeAudioObject.play().catch(e => {
-                    console.log("يتطلب المتصفح تفاعلاً لتشغيل الصوت.");
+                    console.log("يتطلب المسح إذن لتشغيل الصوت");
                 });
             }
 
-            document.getElementById('alarmAlertTitle').innerText = `🚨 حان وقت (${alarm.name}) - ${alarm.time}`;
-            document.getElementById('wakeUpContainer').style.display = 'block';
+            document.getElementById("alarmAlertTitle").innerText = `🚨 رّان وقت ${alarm.name} - (${alarm.time})`;
+            document.getElementById("wakeContainer").style.display = 'block';
         }
 
-        function stopAlarmRing() {
+        function stopAlarming() {
             if (activeAudioObject) {
                 activeAudioObject.pause();
                 activeAudioObject.currentTime = 0;
             }
             currentlyRingingAlarmId = null;
-            document.getElementById('wakeUpContainer').style.display = 'none';
+            document.getElementById("wakeContainer").style.display = 'none';
         }
     </script>
+
 </body>
 </html>

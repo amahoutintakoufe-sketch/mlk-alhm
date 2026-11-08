@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>صوت صدى الهم - المنبه الملكي المتعدد</title>
+    <title>صوت صدى الهم - المنبه الملكي الذكي</title>
     <style>
         :root {
             --bg-color: #050505;
@@ -29,7 +29,7 @@
             box-shadow: var(--border-glow);
             padding: 25px;
             border-radius: 10px;
-            width: 450px;
+            width: 480px;
             text-align: center;
         }
 
@@ -69,7 +69,7 @@
             font-size: 0.8rem;
         }
 
-        input[type="time"], input[type="file"] {
+        input[type="time"], input[type="file"], input[type="text"] {
             background: #000;
             color: var(--terminal-green);
             border: 1px solid var(--terminal-green);
@@ -80,6 +80,27 @@
             width: 100%;
             box-sizing: border-box;
             margin-bottom: 8px;
+        }
+
+        /* تنسيق أيام الأسبوع */
+        .days-selector {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 5px;
+            margin-bottom: 10px;
+            font-size: 0.75rem;
+            background: #000;
+            padding: 8px;
+            border: 1px solid var(--terminal-dark);
+            border-radius: 4px;
+        }
+
+        .days-selector label {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            margin-bottom: 0;
         }
 
         button {
@@ -101,10 +122,9 @@
             box-shadow: 0 0 8px var(--terminal-green);
         }
 
-        /* قائمة المنبهات المضافة */
         .alarms-list {
             margin-top: 15px;
-            max-height: 150px;
+            max-height: 160px;
             overflow-y: auto;
             border: 1px solid var(--terminal-dark);
             padding: 5px;
@@ -113,13 +133,13 @@
 
         .alarm-item {
             background: #001105;
-            padding: 6px 10px;
-            margin-bottom: 5px;
+            padding: 8px;
+            margin-bottom: 6px;
             border-radius: 4px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
         }
 
         .alarm-item button {
@@ -127,10 +147,9 @@
             border-color: #ff0055;
             color: #fff;
             padding: 3px 8px;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
         }
 
-        /* زر الإيقاف الكبير عند الرنين */
         #wakeUpContainer {
             display: none;
             margin-top: 15px;
@@ -165,37 +184,52 @@
 
     <div class="container" id="mainContainer">
         <div class="logo-title">👑 صوت صدى الهم</div>
-        <div class="logo-subtitle">// نظام المنبهات المتعددة والصوت المخصص</div>
+        <div class="logo-subtitle">// المنبه الملكي المتقدم (مع تكرار الأيام)</div>
         
         <div class="clock-display" id="digitalClock">00:00:00</div>
 
-        <!-- قسم الصوت المخصص (تسجيل أو رفع ملف) -->
+        <!-- مصدر الصوت -->
         <div class="section">
-            <label>1. مصدر الصوت (تسجيل صوت أو اختيار ملف):</label>
+            <label>1. مصدر الصوت (تسجيل صوت أو ملف):</label>
             <button id="recordBtn" type="button" onclick="toggleRecording()">بدء التسجيل 🎙️</button>
             <button id="playRecordBtn" type="button" onclick="playRecording()" disabled>استماع 🔊</button>
             <div id="recordStatus" style="font-size: 0.75rem; margin-top: 5px; color: #00cc55;">لم يتم اختيار أو تسجيل صوت بعد</div>
             
-            <label style="margin-top: 8px;">أو ارفع ملف صوتي (MP3/WAV):</label>
+            <label style="margin-top: 8px;">أو رفع ملف صوتي (MP3/WAV):</label>
             <input type="file" id="audioFileInput" accept="audio/*" onchange="handleAudioFile(this)">
         </div>
 
-        <!-- قسم إضافة منبه جديد -->
+        <!-- إضافة منبه جديد مع الأيام -->
         <div class="section">
-            <label for="alarmTimeInput">2. حدد وقت المنبه:</label>
+            <label for="alarmNameInput">اسم المنبه (اختياري):</label>
+            <input type="text" id="alarmNameInput" placeholder="مثال: منبه العمل، صلاة الفجر...">
+
+            <label for="alarmTimeInput">وقت الرنين:</label>
             <input type="time" id="alarmTimeInput">
-            <button type="button" onclick="addAlarm()" style="width:100%; margin-top:5px; background:var(--terminal-green); color:#000;">إضافة منبه جديد ⏰</button>
+
+            <label>أيام التكرار:</label>
+            <div class="days-selector">
+                <label><input type="checkbox" value="0" class="day-chk"> الأحد</label>
+                <label><input type="checkbox" value="1" class="day-chk"> الإثنين</label>
+                <label><input type="checkbox" value="2" class="day-chk"> الثلاثاء</label>
+                <label><input type="checkbox" value="3" class="day-chk"> الأربعاء</label>
+                <label><input type="checkbox" value="4" class="day-chk"> الخميس</label>
+                <label><input type="checkbox" value="5" class="day-chk"> الجمعة</label>
+                <label><input type="checkbox" value="6" class="day-chk"> السبت</label>
+            </div>
+
+            <button type="button" onclick="addAlarm()" style="width:100%; background:var(--terminal-green); color:#000;">إضافة المنبه مع الأيام ⏰</button>
         </div>
 
         <!-- قائمة المنبهات المفعلة -->
         <div class="section" style="text-align: center;">
-            <label>المنبهات النشطة حالياً:</label>
+            <label>المنبهات المجدولة:</label>
             <div class="alarms-list" id="alarmsListContainer">
                 <span style="font-size: 0.75rem; color: #777;">لا توجد منبهات مفعلة</span>
             </div>
         </div>
 
-        <!-- زر إيقاف المنبه عند الرنين (مخفي افتراضياً) -->
+        <!-- شاشة الرنين وإيقاف المنبه -->
         <div id="wakeUpContainer">
             <div id="alarmAlertTitle" style="color:#ff0055; font-weight:bold; margin-bottom:10px;">🚨 حان وقت صدى الهم!</div>
             <button id="wakeUpStopBtn" type="button" onclick="stopAlarmRing()">🛑 استيقظت! إيقاف المنبه</button>
@@ -205,18 +239,19 @@
     <script>
         let mediaRecorder;
         let audioChunks = [];
-        let currentAudioBlob = null; // سيحمل الصوت المسجل أو المرفوع
+        let currentAudioBlob = null;
         let activeAudioObject = null;
-        let alarms = []; // مصفوفة لتخزين المنبهات المتعددة
+        let alarms = [];
         let currentlyRingingAlarmId = null;
+
+        const dayNames = ["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"];
 
         document.addEventListener("DOMContentLoaded", () => {
             if (Notification.permission !== "granted") {
                 Notification.requestPermission();
             }
 
-            // استعادة المنبهات من الذاكرة المحلية
-            const savedAlarms = localStorage.getItem('myAlarmsList');
+            const savedAlarms = localStorage.getItem('myAdvancedAlarmsList');
             if (savedAlarms) {
                 try {
                     alarms = JSON.parse(savedAlarms);
@@ -226,7 +261,6 @@
                 }
             }
 
-            // استعادة الصوت المحفوظ إن وجد
             const savedAudioData = localStorage.getItem('myAlarmAudioBase64');
             if (savedAudioData) {
                 fetch(savedAudioData)
@@ -240,10 +274,11 @@
             }
         });
 
-        // تحديث الساعة والتحقق من المنبهات كل ثانية
+        // التحقق من الوقت وأيام الأسبوع كل ثانية
         function updateClock() {
             try {
                 const now = new Date();
+                const currentDay = now.getDay(); // 0 = الأحد, 1 = الإثنين ... إلخ
                 const hours = String(now.getHours()).padStart(2, '0');
                 const minutes = String(now.getMinutes()).padStart(2, '0');
                 const seconds = String(now.getSeconds()).padStart(2, '0');
@@ -253,17 +288,18 @@
                     clockElem.innerText = `${hours}:${minutes}:${seconds}`;
                 }
 
-                // فحص كل المنبهات المسجلة
                 if (alarms.length > 0 && !currentlyRingingAlarmId) {
                     const currentTimeStr = `${hours}:${minutes}`;
                     alarms.forEach(alarm => {
-                        if (alarm.time === currentTimeStr && seconds === "0" && !alarm.triggeredToday) {
+                        // التحقق إن كان الوقت متطابقاً وأن اليوم الحالي مشمول في الأيام المحددة
+                        const isTodayIncluded = alarm.days.length === 0 || alarm.days.includes(currentDay);
+                        
+                        if (alarm.time === currentTimeStr && seconds === "0" && isTodayIncluded && !alarm.triggeredToday) {
                             alarm.triggeredToday = true;
                             triggerAlarm(alarm);
                         }
                     });
                     
-                    // إعادة تعيين حالة التنبيه لليوم التالي عند تغير الدقيقة
                     if (seconds !== "0") {
                         alarms.forEach(alarm => {
                             if (alarm.time !== currentTimeStr) {
@@ -278,7 +314,6 @@
         }
         setInterval(updateClock, 1000);
 
-        // التعامل مع رفع ملف صوتي خارجي
         function handleAudioFile(input) {
             const file = input.files[0];
             if (file) {
@@ -287,7 +322,6 @@
                 document.getElementById('recordStatus').innerText = `تم رفع الملف: ${file.name} ✅`;
                 document.getElementById('playRecordBtn').disabled = false;
 
-                // حفظ الصوت في LocalStorage بصيغة Base64
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     localStorage.setItem('myAlarmAudioBase64', e.target.result);
@@ -296,14 +330,12 @@
             }
         }
 
-        // تجهيز كائن الصوت للتشغيل
         function setupAudioObject(blob) {
             const audioUrl = URL.createObjectURL(blob);
             activeAudioObject = new Audio(audioUrl);
             activeAudioObject.loop = true;
         }
 
-        // تسجيل الصوت عبر الميكروفون
         async function toggleRecording() {
             const btn = document.getElementById('recordBtn');
             const statusDiv = document.getElementById('recordStatus');
@@ -324,7 +356,6 @@
                         document.getElementById('playRecordBtn').disabled = false;
                         statusDiv.innerText = "حالة التسجيل: تم تسجيل الصوت بنجاح! ✅";
 
-                        // حفظ الصوت المسجل
                         const reader = new FileReader();
                         reader.onload = function(e) {
                             localStorage.setItem('myAlarmAudioBase64', e.target.result);
@@ -353,9 +384,10 @@
             }
         }
 
-        // إضافة منبه جديد للمصفوفة
         function addAlarm() {
+            const nameInput = document.getElementById('alarmNameInput').value.trim() || "منبه عام";
             const timeInput = document.getElementById('alarmTimeInput').value;
+            
             if (!timeInput) {
                 alert("الرجاء تحديد وقت المنبه أولاً!");
                 return;
@@ -365,30 +397,39 @@
                 return;
             }
 
+            // جمع الأيام المحددة
+            const selectedDays = [];
+            document.querySelectorAll('.day-chk:checked').forEach(chk => {
+                selectedDays.push(parseInt(chk.value));
+            });
+
             const newAlarm = {
                 id: Date.now().toString(),
+                name: nameInput,
                 time: timeInput,
+                days: selectedDays, // مصفوفة الأيام (مثلاً: [1, 2, 3])
                 triggeredToday: false
             };
 
             alarms.push(newAlarm);
             saveAndRefreshAlarms();
+            
+            // إعادة ضبط الحقول
             document.getElementById('alarmTimeInput').value = "";
+            document.getElementById('alarmNameInput').value = "";
+            document.querySelectorAll('.day-chk').forEach(chk => chk.checked = false);
         }
 
-        // حذف منبه محدد
         function deleteAlarm(id) {
             alarms = alarms.filter(a => a.id !== id);
             saveAndRefreshAlarms();
         }
 
-        // حفظ القائمة وتحديث واجهة المستخدم
         function saveAndRefreshAlarms() {
-            localStorage.setItem('myAlarmsList', JSON.stringify(alarms));
+            localStorage.setItem('myAdvancedAlarmsList', JSON.stringify(alarms));
             renderAlarmsList();
         }
 
-        // عرض المنبهات في القائمة
         function renderAlarmsList() {
             const container = document.getElementById('alarmsListContainer');
             if (alarms.length === 0) {
@@ -398,22 +439,30 @@
 
             container.innerHTML = "";
             alarms.forEach(alarm => {
+                // تجميع أسماء الأيام لعرضها للمستخدم
+                let daysText = "كل الأيام";
+                if (alarm.days.length > 0) {
+                    daysText = alarm.days.map(d => dayNames[d]).join("، ");
+                }
+
                 container.innerHTML += `
                     <div class="alarm-item">
-                        <span>⏰ ${alarm.time}</span>
+                        <div>
+                            <strong>${alarm.name}</strong> - ⏰ ${alarm.time}<br>
+                            <span style="font-size: 0.7rem; color: #00cc55;">📅 ${daysText}</span>
+                        </div>
                         <button type="button" onclick="deleteAlarm('${alarm.id}')">حذف ❌</button>
                     </div>
                 `;
             });
         }
 
-        // إطلاق المنبه الرنان
         function triggerAlarm(alarm) {
             currentlyRingingAlarmId = alarm.id;
             
             if (Notification.permission === "granted") {
                 new Notification("🚨 حان وقت صدى الهم!", {
-                    body: `منبه الساعة ${alarm.time} يعمل الآن!`,
+                    body: `${alarm.name} (${alarm.time}) يعمل الآن!`,
                     icon: "https://cdn-icons-png.flaticon.com/512/3236/3236746.png"
                 });
             }
@@ -425,11 +474,10 @@
                 });
             }
 
-            document.getElementById('alarmAlertTitle').innerText = `🚨 حان وقت صدى الهم! (${alarm.time})`;
+            document.getElementById('alarmAlertTitle').innerText = `🚨 حان وقت (${alarm.name}) - ${alarm.time}`;
             document.getElementById('wakeUpContainer').style.display = 'block';
         }
 
-        // إيقاف الرنين الحالي
         function stopAlarmRing() {
             if (activeAudioObject) {
                 activeAudioObject.pause();

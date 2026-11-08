@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>صوت صدى الهم - المنبه الملكي</title>
+    <title>صوت صدى الهم - المنبه الملكي المتعدد</title>
     <style>
         :root {
             --bg-color: #050505;
@@ -21,121 +21,138 @@
             align-items: center;
             min-height: 100vh;
             margin: 0;
-            overflow: hidden;
         }
 
         .container {
             background: rgba(0, 20, 5, 0.9);
             border: 2px solid var(--terminal-green);
             box-shadow: var(--border-glow);
-            padding: 30px;
+            padding: 25px;
             border-radius: 10px;
-            width: 420px;
+            width: 450px;
             text-align: center;
         }
 
         .logo-title {
-            font-size: 1.4rem;
+            font-size: 1.3rem;
             color: #fff;
             text-shadow: 0 0 10px var(--terminal-green);
             margin-bottom: 5px;
-            letter-spacing: 1px;
         }
 
         .logo-subtitle {
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             color: var(--terminal-green);
             margin-bottom: 15px;
             opacity: 0.8;
         }
 
         .clock-display {
-            font-size: 2.2rem;
-            margin: 20px 0;
+            font-size: 2rem;
+            margin: 15px 0;
             background: #000;
             border: 1px dashed var(--terminal-green);
-            padding: 10px;
+            padding: 8px;
             letter-spacing: 2px;
         }
 
         .section {
             margin: 15px 0;
             border-top: 1px solid var(--terminal-dark);
-            padding-top: 12px;
+            padding-top: 10px;
+            text-align: right;
         }
 
         label {
             display: block;
-            margin-bottom: 8px;
-            font-size: 0.85rem;
+            margin-bottom: 5px;
+            font-size: 0.8rem;
         }
 
-        input[type="time"] {
+        input[type="time"], input[type="file"] {
             background: #000;
             color: var(--terminal-green);
             border: 1px solid var(--terminal-green);
-            padding: 8px;
+            padding: 6px;
             font-family: inherit;
-            font-size: 1.2rem;
+            font-size: 1rem;
             border-radius: 4px;
-            width: 80%;
-            text-align: center;
+            width: 100%;
+            box-sizing: border-box;
+            margin-bottom: 8px;
         }
 
         button {
             background: var(--terminal-dark);
             color: var(--terminal-green);
             border: 1px solid var(--terminal-green);
-            padding: 10px 18px;
+            padding: 8px 14px;
             font-family: inherit;
             font-weight: bold;
             cursor: pointer;
             border-radius: 4px;
-            margin: 5px;
+            margin: 3px;
             transition: 0.2s;
         }
 
         button:hover {
             background: var(--terminal-green);
             color: #000;
-            box-shadow: 0 0 10px var(--terminal-green);
+            box-shadow: 0 0 8px var(--terminal-green);
         }
 
-        button.active {
+        /* قائمة المنبهات المضافة */
+        .alarms-list {
+            margin-top: 15px;
+            max-height: 150px;
+            overflow-y: auto;
+            border: 1px solid var(--terminal-dark);
+            padding: 5px;
+            text-align: right;
+        }
+
+        .alarm-item {
+            background: #001105;
+            padding: 6px 10px;
+            margin-bottom: 5px;
+            border-radius: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+        }
+
+        .alarm-item button {
             background: #ff0055;
             border-color: #ff0055;
             color: #fff;
+            padding: 3px 8px;
+            font-size: 0.75rem;
         }
 
-        /* زر الإيقاف الكبير عند الاستيقاظ */
-        #wakeUpStopBtn {
+        /* زر الإيقاف الكبير عند الرنين */
+        #wakeUpContainer {
             display: none;
+            margin-top: 15px;
+            background: rgba(255, 0, 85, 0.2);
+            border: 2px dashed #ff0055;
+            padding: 15px;
+            border-radius: 8px;
+            animation: blink 0.8s infinite alternate;
+        }
+
+        #wakeUpStopBtn {
             width: 100%;
             background: #ff0055;
             color: #fff;
             border: 2px solid #fff;
-            font-size: 1.2rem;
-            padding: 15px;
-            margin-top: 15px;
+            font-size: 1.1rem;
+            padding: 12px;
             cursor: pointer;
             border-radius: 6px;
             box-shadow: 0 0 20px #ff0055;
-            animation: pulseBtn 0.8s infinite alternate;
-        }
-
-        @keyframes pulseBtn {
-            from { transform: scale(1); }
-            to { transform: scale(1.03); box-shadow: 0 0 30px #ff0055; }
-        }
-
-        #status {
-            margin-top: 15px;
-            font-size: 0.85rem;
-            color: #00cc55;
-        }
-
-        .alert-box {
-            animation: blink 0.8s infinite alternate;
+            font-family: inherit;
+            font-weight: bold;
         }
 
         @keyframes blink {
@@ -148,61 +165,82 @@
 
     <div class="container" id="mainContainer">
         <div class="logo-title">👑 صوت صدى الهم</div>
-        <div class="logo-subtitle">// نظام التنبيه الصوتي المخصص</div>
+        <div class="logo-subtitle">// نظام المنبهات المتعددة والصوت المخصص</div>
         
         <div class="clock-display" id="digitalClock">00:00:00</div>
 
+        <!-- قسم الصوت المخصص (تسجيل أو رفع ملف) -->
         <div class="section">
-            <label>1. تسجيل رسالة المنبه الخاصة بك:</label>
+            <label>1. مصدر الصوت (تسجيل صوت أو اختيار ملف):</label>
             <button id="recordBtn" type="button" onclick="toggleRecording()">بدء التسجيل 🎙️</button>
             <button id="playRecordBtn" type="button" onclick="playRecording()" disabled>استماع 🔊</button>
-            <div id="recordStatus">حالة التسجيل: لم يتم التسجيل بعد</div>
+            <div id="recordStatus" style="font-size: 0.75rem; margin-top: 5px; color: #00cc55;">لم يتم اختيار أو تسجيل صوت بعد</div>
+            
+            <label style="margin-top: 8px;">أو ارفع ملف صوتي (MP3/WAV):</label>
+            <input type="file" id="audioFileInput" accept="audio/*" onchange="handleAudioFile(this)">
         </div>
 
+        <!-- قسم إضافة منبه جديد -->
         <div class="section">
-            <label for="alarmTime">2. حدد وقت الرنين:</label>
-            <input type="time" id="alarmTime">
-            <br><br>
-            <button id="setAlarmBtn" type="button" onclick="toggleAlarm()">تفعيل المنبه ⏰</button>
+            <label for="alarmTimeInput">2. حدد وقت المنبه:</label>
+            <input type="time" id="alarmTimeInput">
+            <button type="button" onclick="addAlarm()" style="width:100%; margin-top:5px; background:var(--terminal-green); color:#000;">إضافة منبه جديد ⏰</button>
         </div>
 
-        <!-- زر إيقاف المنبه عند الاستيقاظ (مخفي افتراضياً ويظهر عند الرنين) -->
-        <button id="wakeUpStopBtn" type="button" onclick="stopAlarmRing()">🛑 استيقظت! إيقاف المنبه</button>
+        <!-- قائمة المنبهات المفعلة -->
+        <div class="section" style="text-align: center;">
+            <label>المنبهات النشطة حالياً:</label>
+            <div class="alarms-list" id="alarmsListContainer">
+                <span style="font-size: 0.75rem; color: #777;">لا توجد منبهات مفعلة</span>
+            </div>
+        </div>
 
-        <div id="status">المنبه غير مفعل</div>
+        <!-- زر إيقاف المنبه عند الرنين (مخفي افتراضياً) -->
+        <div id="wakeUpContainer">
+            <div id="alarmAlertTitle" style="color:#ff0055; font-weight:bold; margin-bottom:10px;">🚨 حان وقت صدى الهم!</div>
+            <button id="wakeUpStopBtn" type="button" onclick="stopAlarmRing()">🛑 استيقظت! إيقاف المنبه</button>
+        </div>
     </div>
 
     <script>
         let mediaRecorder;
         let audioChunks = [];
-        let audioBlob = null;
-        let recordedAudio = null;
-        let alarmTimeSet = null;
-        let isAlarmActive = false;
-        let alarmTriggered = false;
+        let currentAudioBlob = null; // سيحمل الصوت المسجل أو المرفوع
+        let activeAudioObject = null;
+        let alarms = []; // مصفوفة لتخزين المنبهات المتعددة
+        let currentlyRingingAlarmId = null;
 
-        // استعادة الحالة عند تحميل الصفحة
         document.addEventListener("DOMContentLoaded", () => {
             if (Notification.permission !== "granted") {
                 Notification.requestPermission();
             }
 
-            const savedAlarmTime = localStorage.getItem('alarmTimeSet');
-            const savedActiveState = localStorage.getItem('isAlarmActive');
-            
-            if (savedAlarmTime && savedActiveState === 'true') {
-                alarmTimeSet = savedAlarmTime;
-                isAlarmActive = true;
-                document.getElementById('alarmTime').value = alarmTimeSet;
-                document.getElementById('alarmTime').disabled = true;
-                const btn = document.getElementById('setAlarmBtn');
-                btn.innerText = "إلغاء المنبه ❌";
-                btn.classList.add("active");
-                document.getElementById('status').innerText = `المنبه مفعل في تمام الساعة: ${alarmTimeSet} ⏳ (محفوظ)`;
+            // استعادة المنبهات من الذاكرة المحلية
+            const savedAlarms = localStorage.getItem('myAlarmsList');
+            if (savedAlarms) {
+                try {
+                    alarms = JSON.parse(savedAlarms);
+                    renderAlarmsList();
+                } catch(e) {
+                    alarms = [];
+                }
+            }
+
+            // استعادة الصوت المحفوظ إن وجد
+            const savedAudioData = localStorage.getItem('myAlarmAudioBase64');
+            if (savedAudioData) {
+                fetch(savedAudioData)
+                    .then(res => res.blob())
+                    .then(blob => {
+                        currentAudioBlob = blob;
+                        setupAudioObject(blob);
+                        document.getElementById('recordStatus').innerText = "تم استعادة الصوت المحفوظ بنجاح ✅";
+                        document.getElementById('playRecordBtn').disabled = false;
+                    });
             }
         });
 
-        // تحديث الساعة الحالية
+        // تحديث الساعة والتحقق من المنبهات كل ثانية
         function updateClock() {
             try {
                 const now = new Date();
@@ -215,10 +253,23 @@
                     clockElem.innerText = `${hours}:${minutes}:${seconds}`;
                 }
 
-                if (isAlarmActive && !alarmTriggered && alarmTimeSet) {
+                // فحص كل المنبهات المسجلة
+                if (alarms.length > 0 && !currentlyRingingAlarmId) {
                     const currentTimeStr = `${hours}:${minutes}`;
-                    if (currentTimeStr === alarmTimeSet && now.getSeconds() === 0) {
-                        triggerAlarm();
+                    alarms.forEach(alarm => {
+                        if (alarm.time === currentTimeStr && seconds === "0" && !alarm.triggeredToday) {
+                            alarm.triggeredToday = true;
+                            triggerAlarm(alarm);
+                        }
+                    });
+                    
+                    // إعادة تعيين حالة التنبيه لليوم التالي عند تغير الدقيقة
+                    if (seconds !== "0") {
+                        alarms.forEach(alarm => {
+                            if (alarm.time !== currentTimeStr) {
+                                alarm.triggeredToday = false;
+                            }
+                        });
                     }
                 }
             } catch (e) {
@@ -227,6 +278,32 @@
         }
         setInterval(updateClock, 1000);
 
+        // التعامل مع رفع ملف صوتي خارجي
+        function handleAudioFile(input) {
+            const file = input.files[0];
+            if (file) {
+                currentAudioBlob = file;
+                setupAudioObject(file);
+                document.getElementById('recordStatus').innerText = `تم رفع الملف: ${file.name} ✅`;
+                document.getElementById('playRecordBtn').disabled = false;
+
+                // حفظ الصوت في LocalStorage بصيغة Base64
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    localStorage.setItem('myAlarmAudioBase64', e.target.result);
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // تجهيز كائن الصوت للتشغيل
+        function setupAudioObject(blob) {
+            const audioUrl = URL.createObjectURL(blob);
+            activeAudioObject = new Audio(audioUrl);
+            activeAudioObject.loop = true;
+        }
+
+        // تسجيل الصوت عبر الميكروفون
         async function toggleRecording() {
             const btn = document.getElementById('recordBtn');
             const statusDiv = document.getElementById('recordStatus');
@@ -242,12 +319,17 @@
                     };
 
                     mediaRecorder.onstop = () => {
-                        audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-                        const audioUrl = URL.createObjectURL(audioBlob);
-                        recordedAudio = new Audio(audioUrl);
-                        recordedAudio.loop = true;
+                        currentAudioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                        setupAudioObject(currentAudioBlob);
                         document.getElementById('playRecordBtn').disabled = false;
                         statusDiv.innerText = "حالة التسجيل: تم تسجيل الصوت بنجاح! ✅";
+
+                        // حفظ الصوت المسجل
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            localStorage.setItem('myAlarmAudioBase64', e.target.result);
+                        };
+                        reader.readAsDataURL(currentAudioBlob);
                     };
 
                     mediaRecorder.start();
@@ -265,97 +347,96 @@
         }
 
         function playRecording() {
-            if (recordedAudio) {
-                recordedAudio.currentTime = 0;
-                recordedAudio.play().catch(e => console.log("تعذر التشغيل المباشر"));
+            if (activeAudioObject) {
+                activeAudioObject.currentTime = 0;
+                activeAudioObject.play().catch(e => console.log("تعذر التشغيل المباشر"));
             }
         }
 
-        function toggleAlarm() {
-            const timeInput = document.getElementById('alarmTime').value;
-            const btn = document.getElementById('setAlarmBtn');
-            const status = document.getElementById('status');
-
-            if (!isAlarmActive) {
-                if (!timeInput) {
-                    alert("الرجاء تحديد وقت المنبه أولاً!");
-                    return;
-                }
-                if (!audioBlob && !recordedAudio) {
-                    alert("الرجاء تسجيل صوت المنبه أولاً!");
-                    return;
-                }
-                alarmTimeSet = timeInput;
-                isAlarmActive = true;
-                
-                localStorage.setItem('alarmTimeSet', alarmTimeSet);
-                localStorage.setItem('isAlarmActive', 'true');
-
-                btn.innerText = "إلغاء المنبه ❌";
-                btn.classList.add("active");
-                status.innerText = `المنبه مفعل في تمام الساعة: ${alarmTimeSet} ⏳`;
-                document.getElementById('alarmTime').disabled = true;
-            } else {
-                isAlarmActive = false;
-                alarmTriggered = false;
-                
-                localStorage.removeItem('alarmTimeSet');
-                localStorage.setItem('isAlarmActive', 'false');
-
-                btn.innerText = "تفعيل المنبه ⏰";
-                btn.classList.remove("active");
-                status.innerText = "المنبه غير مفعل";
-                document.getElementById('alarmTime').disabled = false;
-                if (recordedAudio) recordedAudio.pause();
-                document.getElementById('mainContainer').classList.remove('alert-box');
-                document.getElementById('wakeUpStopBtn').style.display = 'none';
+        // إضافة منبه جديد للمصفوفة
+        function addAlarm() {
+            const timeInput = document.getElementById('alarmTimeInput').value;
+            if (!timeInput) {
+                alert("الرجاء تحديد وقت المنبه أولاً!");
+                return;
             }
+            if (!currentAudioBlob) {
+                alert("الرجاء تسجيل أو رفع صوت المنبه أولاً!");
+                return;
+            }
+
+            const newAlarm = {
+                id: Date.now().toString(),
+                time: timeInput,
+                triggeredToday: false
+            };
+
+            alarms.push(newAlarm);
+            saveAndRefreshAlarms();
+            document.getElementById('alarmTimeInput').value = "";
         }
 
-        function triggerAlarm() {
-            alarmTriggered = true;
-            document.getElementById('mainContainer').classList.add('alert-box');
+        // حذف منبه محدد
+        function deleteAlarm(id) {
+            alarms = alarms.filter(a => a.id !== id);
+            saveAndRefreshAlarms();
+        }
+
+        // حفظ القائمة وتحديث واجهة المستخدم
+        function saveAndRefreshAlarms() {
+            localStorage.setItem('myAlarmsList', JSON.stringify(alarms));
+            renderAlarmsList();
+        }
+
+        // عرض المنبهات في القائمة
+        function renderAlarmsList() {
+            const container = document.getElementById('alarmsListContainer');
+            if (alarms.length === 0) {
+                container.innerHTML = `<span style="font-size: 0.75rem; color: #777;">لا توجد منبهات مفعلة</span>`;
+                return;
+            }
+
+            container.innerHTML = "";
+            alarms.forEach(alarm => {
+                container.innerHTML += `
+                    <div class="alarm-item">
+                        <span>⏰ ${alarm.time}</span>
+                        <button type="button" onclick="deleteAlarm('${alarm.id}')">حذف ❌</button>
+                    </div>
+                `;
+            });
+        }
+
+        // إطلاق المنبه الرنان
+        function triggerAlarm(alarm) {
+            currentlyRingingAlarmId = alarm.id;
             
             if (Notification.permission === "granted") {
                 new Notification("🚨 حان وقت صدى الهم!", {
-                    body: "المنبه الملكي يعمل الآن، اضغط لإيقافه.",
+                    body: `منبه الساعة ${alarm.time} يعمل الآن!`,
                     icon: "https://cdn-icons-png.flaticon.com/512/3236/3236746.png"
                 });
             }
 
-            if (recordedAudio) {
-                recordedAudio.currentTime = 0;
-                recordedAudio.play().catch(e => {
+            if (activeAudioObject) {
+                activeAudioObject.currentTime = 0;
+                activeAudioObject.play().catch(e => {
                     console.log("يتطلب المتصفح تفاعلاً لتشغيل الصوت.");
                 });
             }
 
-            // إظهار زر الإيقاف الكبير فور رنين المنبه
-            document.getElementById('wakeUpStopBtn').style.display = 'block';
-            document.getElementById('status.innerText') = "";
-            document.getElementById('status').innerHTML = `🚨 <strong>حان وقت صدى الهم! استيقظ!</strong>`;
+            document.getElementById('alarmAlertTitle').innerText = `🚨 حان وقت صدى الهم! (${alarm.time})`;
+            document.getElementById('wakeUpContainer').style.display = 'block';
         }
 
+        // إيقاف الرنين الحالي
         function stopAlarmRing() {
-            if (recordedAudio) {
-                recordedAudio.pause();
-                recordedAudio.currentTime = 0;
+            if (activeAudioObject) {
+                activeAudioObject.pause();
+                activeAudioObject.currentTime = 0;
             }
-            alarmTriggered = false;
-            isAlarmActive = false;
-            
-            localStorage.removeItem('alarmTimeSet');
-            localStorage.setItem('isAlarmActive', 'false');
-
-            const btn = document.getElementById('setAlarmBtn');
-            btn.innerText = "تفعيل المنبه ⏰";
-            btn.classList.remove("active");
-            document.getElementById('status').innerText = "المنبه غير مفعل";
-            document.getElementById('alarmTime').disabled = false;
-            document.getElementById('mainContainer').classList.remove('alert-box');
-            
-            // إخفاء زر الإيقاف الكبير مجدداً
-            document.getElementById('wakeUpStopBtn').style.display = 'none';
+            currentlyRingingAlarmId = null;
+            document.getElementById('wakeUpContainer').style.display = 'none';
         }
     </script>
 </body>
